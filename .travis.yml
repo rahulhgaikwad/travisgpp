@@ -1,12 +1,22 @@
-language:
-   - cpp
+sudo: required
+language: cpp
+compiler:
+   - g++
 
-install:
+before_install:
+   - sudo apt-get update
    - sudo apt-get install libgtest-dev
+   - "cd /usr/src/gtest && sudo cmake . && sudo cmake --build . && sudo mv libg* /usr/local/lib/ ; cd -"
+   - pip install --user cpp-coveralls
 
 script:
-    - mkdir _builds
-    - cd _builds
-    - cmake ..
-    - make
-    - ctest
+   - make
+   - ./ConnectXTest
+   - gcov -b ConnectX.cpp
+
+after_success:
+   - coveralls --exclude lib --gcov-options '\-lp'
+   - make clean
+
+notifications:
+  email: false
